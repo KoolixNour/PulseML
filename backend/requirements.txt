@@ -2,3 +2,7 @@ fastapi
 redis
 types-redis
 uvicorn
+jinja2
+plotly
+dash
+pandas
