@@ -5,7 +5,7 @@ import pandas as pd
 router = APIRouter()
 
 # Charger un dataset
-data = pd.read_csv("PulseMLdatabase/framingham_cleaned.csv")
+data = pd.read_csv("database/framingham_cleaned.csv")
 
 @router.get("/graphs")
 async def render_graphs():

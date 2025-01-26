@@ -62,31 +62,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Vérifier que le bouton "Afficher les détails" est présent
+document.addEventListener('DOMContentLoaded', () => {
     const chapitre1Link = document.querySelector("#chapitre1-link");
-
     if (chapitre1Link) {
-        chapitre1Link.addEventListener("click", async (event) => {
-            event.preventDefault(); // Empêche le chargement complet de la page
-
-            try {
-                const response = await fetch("/chapitre1");
-                if (response.ok) {
-                    const content = await response.text();
-
-                    // Injecter le contenu de chapitre1.html dans la balise <main>
-                    document.querySelector("main").innerHTML = content;
-                } else {
-                    console.error("Erreur HTTP :", response.status);
-                }
-            } catch (error) {
-                console.error("Erreur lors du chargement du chapitre 1 :", error);
-            }
+        chapitre1Link.addEventListener("click", async () => {
+            await new Promise(resolve => setTimeout(resolve, 100)); // Petit délai pour s'assurer que le DOM est mis à jour
+            initializeCharts();
         });
-    } else {
-        console.error("Le bouton chapitre1-link n'a pas été trouvé.");
     }
 });
 
@@ -261,6 +243,188 @@ async function initializeCharts() {
                 }
             }
         });
+        // Age Histogram
+        const histogramCanvas = document.getElementById("histogramCanvas");
+        if (!histogramCanvas) {
+            console.error("Canvas histogramCanvas not found");
+            return;
+        }
+
+        const ctx = histogramCanvas.getContext('2d');
+        
+        const ageValues = data.map(item => item.age);
+        const minAge = Math.min(...ageValues);
+        const maxAge = Math.max(...ageValues);
+        const binWidth = 5;
+        const bins = Math.ceil((maxAge - minAge) / binWidth);
+        
+        const histogramData = Array(bins).fill(0);
+        ageValues.forEach(age => {
+            const binIndex = Math.floor((age - minAge) / binWidth);
+            if (binIndex >= 0 && binIndex < bins) {
+                histogramData[binIndex]++;
+            }
+        });
+        
+        const histogramLabels = Array(bins).fill(0).map((_, i) => minAge + (i * binWidth));
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: histogramLabels,
+                datasets: [{
+                    label: 'Distribution par âge',
+                    data: histogramData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Tendance',
+                    type: 'line',
+                    data: histogramData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribution de l\'âge'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Âge'
+                        },
+                        grid: {
+                            display: true
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Nombre de patients'
+                        },
+                        beginAtZero: true,
+                        grid: {
+                            display: true
+                        }
+                    }
+                }
+            }
+        });
+        
+    // Gender distribution pie chart
+    const genderCtx = document.getElementById('genderPieChart').getContext('2d');
+    const genderData = {
+        male: data.filter(item => item.sex === 1).length,
+        female: data.filter(item => item.sex === 0).length
+    };
+    
+    new Chart(genderCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Hommes', 'Femmes'],
+            datasets: [{
+                data: [genderData.male, genderData.female],
+                backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Smokers percentage pie chart
+    const smokersCtx = document.getElementById('smokersPieChart').getContext('2d');
+    const smokersData = {
+        smokers: data.filter(item => item.currentSmoker === 1).length,
+        nonSmokers: data.filter(item => item.currentSmoker === 0).length
+    };
+    
+    new Chart(smokersCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Fumeurs', 'Non-fumeurs'],
+            datasets: [{
+                data: [smokersData.smokers, smokersData.nonSmokers],
+                backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(75, 192, 192, 0.8)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Average cigarettes per day bar chart
+    const cigarettesCtx = document.getElementById('cigarettesBarChart').getContext('2d');
+    const smokerGroups = data.reduce((acc, item) => {
+        if (item.cigsPerDay) {
+            const group = Math.floor(item.cigsPerDay / 5) * 5;
+            acc[group] = (acc[group] || 0) + 1;
+        }
+        return acc;
+    }, {});
+
+    new Chart(cigarettesCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(smokerGroups).map(k => `${k}-${parseInt(k)+5}`),
+            datasets: [{
+                label: 'Nombre de fumeurs',
+                data: Object.values(smokerGroups),
+                backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre de personnes'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Cigarettes par jour'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
 
     } catch (error) {
         console.error("Erreur lors du chargement des graphiques :", error);
