@@ -32,6 +32,10 @@ async def get_dashboard(request: Request):
 async def get_chapitre1(request: Request):
     return templates.TemplateResponse("chapitre1.html", {"request": request})
 
+@app.get("/chapitre4", response_class=HTMLResponse)
+async def get_chapitre1(request: Request):
+    return templates.TemplateResponse("chapitre4.html", {"request": request})
+
 @app.get("/framingham-data")
 async def get_framingham_data():
     return data.to_dict(orient="records")

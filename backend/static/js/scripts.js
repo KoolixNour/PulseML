@@ -66,7 +66,29 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
     // Vérifier que le bouton "Afficher les détails" est présent
     const chapitre1Link = document.querySelector("#chapitre1-link");
+    const chapitre4Link = document.querySelector("#chapitre4-link");
 
+    if (chapitre4Link) {
+        chapitre1Link.addEventListener("click", async (event) => {
+            event.preventDefault(); // Empêche le chargement complet de la page
+
+            try {
+                const response = await fetch("/chapitre4");
+                if (response.ok) {
+                    const content = await response.text();
+
+                    // Injecter le contenu de chapitre1.html dans la balise <main>
+                    document.querySelector("main").innerHTML = content;
+                } else {
+                    console.error("Erreur HTTP :", response.status);
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement du chapitre 4 :", error);
+            }
+        });
+    } else {
+        console.error("Le bouton chapitre4-link n'a pas été trouvé.");
+    }
     if (chapitre1Link) {
         chapitre1Link.addEventListener("click", async (event) => {
             event.preventDefault(); // Empêche le chargement complet de la page
@@ -92,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function attachChapterEvents() {
     const chapitre1Link = document.querySelector("#chapitre1-link");
+    const chapitre4Link = document.querySelector("#chapitre4-link");
 
     if (chapitre1Link) {
         chapitre1Link.addEventListener("click", async (event) => {
@@ -116,6 +139,32 @@ function attachChapterEvents() {
                 }
             } catch (error) {
                 console.error("Erreur lors du chargement du chapitre 1 :", error);
+            }
+        });
+    }
+    if (chapitre4Link) {
+        chapitre1Link.addEventListener("click", async (event) => {
+            event.preventDefault(); // Empêche le rechargement de la page
+
+            try {
+                // Charger le contenu de /chapitre1 via l'API
+                const response = await fetch("/chapitre4");
+                if (response.ok) {
+                    const content = await response.text();
+
+                    // Injecter le contenu dans <main id="dash">
+                    const mainElement = document.querySelector("main#dash");
+                    if (mainElement) {
+                        mainElement.innerHTML = content; // Remplace le contenu existant par celui chargé
+                        console.log("Contenu du chapitre 4 chargé avec succès !");
+                    } else {
+                        console.error("Erreur : L'élément <main id='dash'> n'existe pas !");
+                    }
+                } else {
+                    console.error("Erreur HTTP lors de la récupération de /chapitre4 :", response.status);
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement du chapitre 4 :", error);
             }
         });
     }
@@ -261,10 +310,192 @@ async function initializeCharts() {
                 }
             }
         });
+        const histogramCanvas = document.getElementById("histogramCanvas");
+        const scatterSysBPvsDiaBP = document.getElementById("scatterSysBPvsDiaBP");
+        const scatterAgeVsBMI = document.getElementById("scatterAgeVsBMI");
+        const violinHeartrate = document.getElementById("violinHeartrate");
+
+        if (!histogramCanvas || !scatterSysBPvsDiaBP || !scatterAgeVsBMI || !violinHeartrate) {
+            console.error("Les éléments <canvas> ne sont pas trouvés dans le DOM !");
+            return;
+        }
+
+        // Préparer les données pour l'histogramme
+        const cigarettesPerDay = [...new Set(data.map(item => item.cigarettesPerDay))].sort((a, b) => a - b);
+        const tenYearCHD = [0, 1];
+        const histogramData = tenYearCHD.map(chd => {
+            return cigarettesPerDay.map(cig => {
+                return data.filter(item => item.cigarettesPerDay === cig && item.TenYearCHD === chd).length;
+            });
+        });
+
+        // Histogramme
+        new Chart(histogramCanvas, {
+            type: "bar",
+            data: {
+                labels: cigarettesPerDay,
+                datasets: [{
+                    label: "TenYearCHD = 0",
+                    data: histogramData[0],
+                    backgroundColor: "rgba(54, 162, 235, 0.2)",
+                    borderColor: "rgba(54, 162, 235, 1)",
+                    borderWidth: 1
+                }, {
+                    label: "TenYearCHD = 1",
+                    data: histogramData[1],
+                    backgroundColor: "rgba(255, 206, 86, 0.2)",
+                    borderColor: "rgba(255, 206, 86, 1)",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top",
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Cigarettes par jour"
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Nombre"
+                        }
+                    }
+                }
+            }
+        });
+
+        // Préparer les données pour le nuage de points sysBP vs. diaBP
+        const sysBP = data.map(item => item.sysBP);
+        const diaBP = data.map(item => item.diaBP);
+        const tenYearCHDColors = data.map(item => item.TenYearCHD === 1 ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)');
+
+        // Nuage de points sysBP vs. diaBP
+        new Chart(scatterSysBPvsDiaBP, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'sysBP vs. diaBP',
+                    data: data.map(item => ({ x: item.sysBP, y: item.diaBP })),
+                    backgroundColor: tenYearCHDColors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Pression systolique (sysBP)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Pression diastolique (diaBP)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Préparer les données pour le nuage de points âge vs. BMI
+        const age = data.map(item => item.age);
+        const BMI = data.map(item => item.BMI);
+
+        // Nuage de points âge vs. BMI
+        new Chart(scatterAgeVsBMI, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Age vs. BMI',
+                    data: data.map(item => ({ x: item.age, y: item.BMI })),
+                    backgroundColor: tenYearCHDColors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Âge'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'BMI'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Préparer les données pour le violin plot de la fréquence cardiaque
+        const heartrateData = tenYearCHD.map(chd => {
+            return data.filter(item => item.TenYearCHD === chd).map(item => item.heartrate);
+        });
+
+        // Violin plot de la fréquence cardiaque
+        new Chart(violinHeartrate, {
+            type: 'boxplot',
+            data: {
+                labels: tenYearCHD,
+                datasets: [{
+                    label: 'Fréquence cardiaque',
+                    data: heartrateData,
+                    backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top",
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'TenYearCHD'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Fréquence cardiaque'
+                        }
+                    }
+                }
+            }
+        });
+
 
     } catch (error) {
         console.error("Erreur lors du chargement des graphiques :", error);
     }
+    
 }
 
 function attachChapterEvents() {
