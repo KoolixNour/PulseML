@@ -132,9 +132,59 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// Fonction pour attendre que Chart.js soit chargé
+function waitForChartJS() {
+    return new Promise((resolve, reject) => {
+        if (typeof Chart !== 'undefined') {
+            resolve();
+        } else {
+            // Attendre au maximum 5 secondes
+            let attempts = 0;
+            const interval = setInterval(() => {
+                if (typeof Chart !== 'undefined') {
+                    clearInterval(interval);
+                    resolve();
+                } else if (attempts >= 50) { // 5 secondes (100ms * 50)
+                    clearInterval(interval);
+                    reject(new Error("Chart.js n'a pas pu être chargé"));
+                }
+                attempts++;
+            }, 100);
+        }
+    });
+}
+
+// Fonction pour charger les données avec retry
+async function loadFraminghamData(retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch("/framingham-data");
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            console.log("Données chargées avec succès:", data.length, "enregistrements");
+            return data;
+        } catch (error) {
+            console.warn(`Tentative ${i + 1}/${retries} échouée:`, error);
+            if (i === retries - 1) throw error;
+            // Attendre avant de réessayer (temps d'attente exponentiell)
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+        }
+    }
+}
 
 async function initializeCharts() {
     try {
+        // 1. Attendre que Chart.js soit chargé
+        await waitForChartJS();
+        console.log("Chart.js chargé avec succès");
+
+        // 2. Vérifier si le canvas existe
+        const canvas = document.getElementById('genderPieChart');
+        if (!canvas) {
+            throw new Error("Canvas 'genderPieChart' non trouvé dans le DOM");
+        }
+        console.log("Canvas trouvé");
+
         console.log("Chargement des données depuis l'API...");
 
         // Récupérer les données depuis l'API
@@ -326,32 +376,87 @@ async function initializeCharts() {
             }
         });
         
-    // Gender distribution pie chart
-    const genderCtx = document.getElementById('genderPieChart').getContext('2d');
-    const genderData = {
-        male: data.filter(item => item.sex === 1).length,
-        female: data.filter(item => item.sex === 0).length
-    };
-    
-    new Chart(genderCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Hommes', 'Femmes'],
-            datasets: [{
-                data: [genderData.male, genderData.female],
-                backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
+        console.log("Premier enregistrement:", data[0]);
+        console.log("Noms des colonnes:", Object.keys(data[0]));
+        
+        let sexField = Object.keys(data[0]).find(key => 
+            key.toLowerCase().includes('sex') || 
+            key.toLowerCase().includes('gender') || 
+            key.toLowerCase().includes('male')
+        );
+        
+        console.log("Champ identifié pour le sexe:", sexField);
+        
+        const genderStats = data.reduce((acc, item) => {
+            const sexValue = item[sexField]; 
+            console.log("Valeur trouvée pour le sexe:", sexValue, typeof sexValue);
+            
+            let gender;
+            if (typeof sexValue === 'number') {
+                gender = sexValue === 1 ? 'Hommes' : 'Femmes';
+            } else if (typeof sexValue === 'string') {
+                gender = sexValue.toLowerCase().includes('m') ? 'Hommes' : 'Femmes';
             }
+            
+            if (gender) {
+                acc[gender] = (acc[gender] || 0) + 1;
+            }
+            return acc;
+        }, { 'Hommes': 0, 'Femmes': 0 });
+        
+        // Calculer les pourcentages
+        const total = Object.values(genderStats).reduce((a, b) => a + b, 0);
+        const malePercentage = ((genderStats['Hommes'] / total) * 100).toFixed(1);
+        const femalePercentage = ((genderStats['Femmes'] / total) * 100).toFixed(1);
+        
+        // Créer les labels avec pourcentages
+        const labels = [
+            `Hommes (${malePercentage}%)`,
+            `Femmes (${femalePercentage}%)`
+        ];
+        
+        const genderCanvas = document.getElementById('genderPieChart');
+        if (genderCanvas) {
+            const ctx = genderCanvas.getContext('2d');
+            ctx.clearRect(0, 0, genderCanvas.width, genderCanvas.height);
+        
+            new Chart(genderCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,  // Utiliser les labels avec pourcentages
+                    datasets: [{
+                        data: [genderStats['Hommes'], genderStats['Femmes']],
+                        backgroundColor: ['#7CB9E8', '#FFB6C1'],
+                        borderColor: ['#0066b2', '#FF69B4'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
-    });
 
     // Smokers percentage pie chart
     const smokersCtx = document.getElementById('smokersPieChart').getContext('2d');
@@ -359,11 +464,22 @@ async function initializeCharts() {
         smokers: data.filter(item => item.currentSmoker === 1).length,
         nonSmokers: data.filter(item => item.currentSmoker === 0).length
     };
-    
+
+    // Calculer les pourcentages
+    const totalSmokers = smokersData.smokers + smokersData.nonSmokers;
+    const smokersPercentage = ((smokersData.smokers / totalSmokers) * 100).toFixed(1);
+    const nonSmokersPercentage = ((smokersData.nonSmokers / totalSmokers) * 100).toFixed(1);
+
+    // Créer les labels avec pourcentages
+    const labelsSmokers = [
+        `Fumeurs (${smokersPercentage}%)`,
+        `Non-fumeurs (${nonSmokersPercentage}%)`
+    ];
+
     new Chart(smokersCtx, {
         type: 'pie',
         data: {
-            labels: ['Fumeurs', 'Non-fumeurs'],
+            labels: labelsSmokers,
             datasets: [{
                 data: [smokersData.smokers, smokersData.nonSmokers],
                 backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(75, 192, 192, 0.8)'],
@@ -374,7 +490,21 @@ async function initializeCharts() {
             responsive: true,
             plugins: {
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
