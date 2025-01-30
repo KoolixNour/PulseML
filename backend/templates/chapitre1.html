@@ -1,0 +1,166 @@
+<div class="container">
+    <h2> Chapitre 1 : Démographie et comportements liés à la santé</h2>
+    <p> <B>Objectif :</B> Présenter la population étudiée et les habitudes générales (âge, sexe, habitudes de tabagisme, etc.). </p>
+
+
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Distribution de l'Âge
+                </div>
+                <div class="card-body">
+                    <canvas id="histogramCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Cet histogramme montre la distribution des âges dans notre ensemble de données.
+                    Il permet de visualiser la répartition des patients par tranche d'âge et
+                    d'identifier les groupes d'âge les plus représentés dans l'étude.
+                    Une courbe de densité est superposée pour mieux illustrer la tendance générale.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gender Distribution -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    Répartition des sexes
+                </div>
+                <div class="card-body">
+                    <canvas id="genderPieChart" style="min-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce graphique illustre la distribution des patients par sexe dans l'étude.
+                    Cette visualisation permet d'évaluer la représentativité de l'échantillon
+                    et d'identifier d'éventuelles disparités dans la prévalence des maladies
+                    cardiovasculaires entre les hommes et les femmes.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smokers Percentage -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    Pourcentage de fumeurs
+                </div>
+                <div class="card-body">
+                    <canvas id="smokersPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce graphique présente la proportion de fumeurs et non-fumeurs dans l'étude.
+                    Le tabagisme étant un facteur de risque majeur pour les maladies cardiovasculaires,
+                    cette information est cruciale pour comprendre la distribution des risques dans
+                    la population étudiée et évaluer l'impact potentiel sur la santé cardiaque.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cigarettes per Day -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Cigarettes par jour
+                </div>
+                <div class="card-body">
+                    <canvas id="cigarettesBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce graphique montre la distribution du nombre de cigarettes fumées quotidiennement.
+                    Cette mesure quantitative du tabagisme permet d'évaluer l'intensité de l'exposition
+                    au tabac et son potentiel impact sur la santé cardiovasculaire des patients.
+                    L'analyse de ces données aide à comprendre les habitudes de consommation et
+                    leurs implications pour le risque cardiovasculaire.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique en barres avec texte -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Nombre de Fumeurs par Catégorie d'Éducation
+                </div>
+                <div class="card-body">
+                    <canvas id="barChartCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce graphique illustre la corrélation entre le niveau d'éducation et le nombre de fumeurs. Les données
+                    montrent que les individus avec un niveau d'éducation plus faible ont une prévalence plus élevée de
+                    tabagisme. Cela peut être attribué à un manque d'accès à l'information sur les dangers du tabac.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique en aires avec texte -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-area me-1"></i>
+                    Taux de Cholestérol Moyen par Âge
+                </div>
+                <div class="card-body">
+                    <canvas id="areaChartCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce graphique montre comment le taux de cholestérol moyen varie avec l'âge. On observe généralement
+                    une augmentation du taux de cholestérol avec l'âge, atteignant un pic dans les tranches d'âge
+                    entre 50 et 60 ans. Cette tendance peut être liée à des changements dans le métabolisme et
+                    au mode de vie.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Import des scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/scripts.js"></script>
+</div>
