@@ -1,0 +1,194 @@
+<div class="container">
+  <h2>Chapitre 2 - Facteurs de Risque Médicaux</h2>
+  <p>Ce chapitre explore les facteurs cliniques influençant les maladies cardiovasculaires, notamment la pression artérielle, le cholestérol, le diabète, et leur prévalence.</p>
+
+  <!-- Graphique 1 : Boxplot Tension Artérielle Systolique -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-bar me-1"></i>
+          Distribution de la Tension Artérielle Systolique (sysBP)
+        </div>
+        <div class="card-body">
+          <canvas id="boxPlotSysBP"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique montre la répartition des valeurs de la tension artérielle systolique (SysBP) mesurée dans l'échantillon de données. Il s'agit d'un histogramme où chaque barre représente une plage spécifique de valeurs de tension artérielle systolique</p>
+        <p>
+          <strong>Les points principaux à noter sont :</strong>
+        </p>
+        <p>
+          <strong>Axes:</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal représente les plages de tension artérielle systolique (exprimées en mmHg), segmentées en intervalles réguliers.</li>
+          <li>L'axe vertical indique le nombre d'individus dans chaque plage (fréquence).</li>
+        </ul>
+        <p>
+          <strong>Tendances :</strong>
+          La majorité des individus ont des valeurs de tension artérielle systolique comprises entre 104.7 et 146.9 mmHg. <br />
+          Les valeurs extrêmes (inférieures à 104.7 ou supérieures à 210.4 mmHg) sont moins fréquentes, ce qui suggère une distribution centrée sur les plages moyennes.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique 3 : Taux de Diabète par Âge -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-line me-1"></i>
+          Taux de Diabète par Âge
+        </div>
+        <div class="card-body">
+          <canvas id="diabetesByAge"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique illustre le taux de prévalence du diabète en fonction des tranches d'âge dans l'échantillon. Il s'agit d'un graphique en courbes où chaque point représente la prévalence moyenne du diabète pour une tranche d'âge donnée.</p>
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes:</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal représente les âges (en années), allant de 32 à 70 ans.</li>
+          <li>L'axe vertical représente le taux de diabète, exprimé sous forme de proportion.</li>
+        </ul>
+        <p>
+          <strong>Tendances :</strong>
+          Le taux de diabète varie avec l'âge, montrant une augmentation progressive et significative à partir de la quarantaine. <br />
+          Des pics de prévalence sont observés autour des âges de 50 à 60 ans, indiquant une concentration plus importante de cas dans ces tranches d'âge.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique 4 : Taux de Diabète par Sexe -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-pie me-1"></i>
+          Répartition du Diabète par Sexe
+        </div>
+        <div class="card-body">
+          <canvas id="diabetesBySex"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique représente la répartition du diabète par sexe à l'aide d'un diagramme circulaire (camembert). Chaque segment illustre la proportion de cas de diabète parmi les hommes et les femmes dans l'échantillon étudié.</p>
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes et proportions :</strong>
+        </p>
+        <ul>
+          <li>La couleur rose correspond aux hommes.</li>
+          <li>La couleur bleue correspond aux femmes.</li>
+          <li>Les tailles des segments indiquent les proportions respectives de chaque sexe parmi les individus atteints de diabète.</li>
+        </ul>
+        <p>
+          <strong>Analyse des données :</strong>
+          <br /> Ce graphique permet de visualiser les différences de prévalence du diabète entre les sexes. Une répartition presque égale entre les hommes et les femmes pourrait suggérer que le sexe n'a pas une influence significative sur la prévalence du diabète. <br />
+          Une différence marquée, en revanche, indiquerait une possible influence biologique, sociale ou comportementale.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique 5 : Moyenne Tension Artérielle par Sexe -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-bar me-1"></i>
+          Moyenne de la Tension Artérielle par Sexe
+        </div>
+        <div class="card-body">
+          <canvas id="avgBPBySex"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique représente la moyenne de la tension artérielle systolique (SysBP) selon le sexe à l'aide d'un histogramme comparatif.</p>
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes et barres:</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal (X) distingue les deux sexes : Homme et Femme.</li>
+          <li>L'axe vertical (Y) représente la moyenne de la tension artérielle systolique en millimètres de mercure (mmHg).</li>
+          <li>Chaque barre montre la valeur moyenne pour un sexe donné.</li>
+        </ul>
+        <p>
+          <strong>Analyse des données :</strong>
+          <br /> Les hommes présentent une tension artérielle systolique moyenne plus élevée par rapport aux femmes. <br />
+          Cette différence peut être influencée par des facteurs biologiques, hormonaux ou comportementaux, tels que le mode de vie ou les antécédents de maladies cardiovasculaires.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique 6 : Corrélation sysBP/diaBP -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fi-sr-chart-scatter"></i>
+          Corrélation entre sysBP et diaBP
+        </div>
+        <div class="card-body">
+          <canvas id="scatterSysDiaBP"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique représente la corrélation entre les valeurs systoliques (sysBP) et diastoliques (diaBP) de la tension artérielle sous forme de diagramme de dispersion.</p>
+
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes et points:</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal (X) représente les valeurs de la tension artérielle systolique (sysBP).</li>
+          <li>L'axe vertical (Y) représente les valeurs de la tension artérielle diastolique (diaBP).</li>
+          <li>Chaque point correspond à une observation individuelle, avec sa tension artérielle systolique et diastolique.</li>
+        </ul>
+        <p>
+          <strong>Tendance et interprétation :</strong>
+          <br /> Une tendance linéaire ascendante est observée, indiquant une corrélation positive entre les deux variables. Cela signifie que lorsque la tension systolique augmente, la tension diastolique tend également à augmenter. <br />
+          Cette relation cohérente reflète le lien physiologique entre les deux mesures de la tension artérielle.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import des scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/static/js/scripts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/@sgratzl/chartjs-chart-boxplot@3.6.0/build/index.umd.min.js"></script>
+</div>

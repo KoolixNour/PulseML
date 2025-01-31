@@ -6,10 +6,6 @@ window.addEventListener('DOMContentLoaded', event => {
     // Toggle the side navigation
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
     if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
         sidebarToggle.addEventListener('click', event => {
             event.preventDefault();
             document.body.classList.toggle('sb-sidenav-toggled');
@@ -23,7 +19,7 @@ window.addEventListener('DOMContentLoaded', event => {
 document.addEventListener("DOMContentLoaded", () => {
     // Sélectionner le lien "Tableau" dans le menu
     const tableLink = document.querySelector("#table-link");
-    
+
     // Ajouter un gestionnaire d'événement pour le clic
     tableLink.addEventListener("click", async (event) => {
         event.preventDefault(); // Empêcher le chargement complet de la page
@@ -62,158 +58,390 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const chapitre1Link = document.querySelector("#chapitre1-link");
-    if (chapitre1Link) {
-        chapitre1Link.addEventListener("click", async () => {
-            await new Promise(resolve => setTimeout(resolve, 100)); // Petit délai pour s'assurer que le DOM est mis à jour
-            initializeCharts();
-        });
-    }
-});
 
-function attachChapterEvents() {
-    const chapitre1Link = document.querySelector("#chapitre1-link");
 
-    if (chapitre1Link) {
-        chapitre1Link.addEventListener("click", async (event) => {
-            event.preventDefault(); // Empêche le rechargement de la page
 
-            try {
-                // Charger le contenu de /chapitre1 via l'API
-                const response = await fetch("/chapitre1");
-                if (response.ok) {
-                    const content = await response.text();
-
-                    // Injecter le contenu dans <main id="dash">
-                    const mainElement = document.querySelector("main#dash");
-                    if (mainElement) {
-                        mainElement.innerHTML = content; // Remplace le contenu existant par celui chargé
-                        console.log("Contenu du chapitre 1 chargé avec succès !");
-                    } else {
-                        console.error("Erreur : L'élément <main id='dash'> n'existe pas !");
-                    }
-                } else {
-                    console.error("Erreur HTTP lors de la récupération de /chapitre1 :", response.status);
-                }
-            } catch (error) {
-                console.error("Erreur lors du chargement du chapitre 1 :", error);
-            }
-        });
-    }
-}
-
-// Appeler la fonction pour attacher les événements après le chargement de la page
-document.addEventListener("DOMContentLoaded", attachChapterEvents);
-
-// Réattacher les événements après le chargement de "dashboard.html"
 document.addEventListener("DOMContentLoaded", () => {
-    const dashboardLink = document.querySelector("#dashboard-link");
+    console.log("📌 Script chargé.");
+    let charts = {}; // Stockage des graphiques actifs
+    /**
+     * Nettoie les graphiques existants avant d'en charger de nouveaux
+     */
+    function clearCharts() {
+        console.log("🧹 Suppression des anciens graphiques...");
+        Object.values(charts).forEach(chart => {
+            if (chart) chart.destroy();
+        });
+        charts = {}; // Réinitialisation
+    }
+    /**
+     * Charge dynamiquement un chapitre en fonction du lien cliqué
+     */
+    // Fonction générique pour charger un chapitre
+    const loadChapter = async (chapterLinkSelector, endpoint) => {
+        const chapterLink = document.querySelector(chapterLinkSelector);
 
-    if (dashboardLink) {
-        dashboardLink.addEventListener("click", async (event) => {
-            event.preventDefault();
+        if (chapterLink) {
+            chapterLink.addEventListener("click", async (event) => {
+                event.preventDefault();
+                console.log(`🚀 Changement de chapitre : Nettoyage et chargement de ${endpoint}...`);
 
-            try {
-                const response = await fetch("/dashboard");
-                if (response.ok) {
+                clearCharts(); // Supprime les anciens graphiques
+
+                try {
+                    const response = await fetch(endpoint);
+                    if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+
                     const content = await response.text();
-                    document.querySelector("main").innerHTML = content;
+                    const mainElement = document.querySelector("main#dash");
+                    if (!mainElement) {
+                        console.error("❌ Erreur : L'élément <main> n'a pas été trouvé !");
+                        return;
+                    }
 
-                    // Réattacher les événements pour les nouveaux contenus
-                    attachChapterEvents();
-                } else {
-                    console.error("Erreur HTTP :", response.status);
+                    mainElement.innerHTML = content;
+                    console.log(`✅ Contenu du ${endpoint} chargé avec succès.`);
+
+                    // Vérification que tous les graphiques du chapitre sont bien dans le DOM avant initialisation
+                    setTimeout(() => {
+                        console.log("🕒 Vérification des éléments Canvas avant d'initialiser les graphiques...");
+
+                        initializeCharts(endpoint);
+                    }, 500);
+                } catch (error) {
+                    console.error(`❌ Erreur lors du chargement de ${endpoint} :`, error);
                 }
-            } catch (error) {
-                console.error("Erreur lors du chargement du tableau de bord :", error);
+            });
+        } else {
+            console.error(`⚠️ Le lien pour ${chapterLinkSelector} n'a pas été trouvé.`);
+        }
+    };
+    /**
+     * Initialise les graphiques selon le chapitre affiché
+     */
+    async function initializeCharts(endpoint) {
+        try {
+            console.log("📡 Récupération des données...");
+            const response = await fetch("/framingham-data");
+            if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
+
+            const data = await response.json();
+            console.log("📊 Données reçues :", data);
+
+            // 🔹 Détection du chapitre en cours
+            let chapterNumber = endpoint.match(/\d+/)[0];
+
+            if (chapterNumber === "1") {
+                console.log("📌 Initialisation des graphiques du Chapitre 1...");
+                initializeChapter1Charts(data);
+            } else if (chapterNumber === "2") {
+                console.log("📌 Initialisation des graphiques du Chapitre 2...");
+                initializeChapter2Charts(data);
+            }
+
+        } catch (error) {
+            console.error("❌ Erreur lors du chargement des graphiques :", error);
+        }
+    }
+
+    /**
+     * Initialise les graphiques spécifiques au Chapitre 1
+     */
+
+    function initializeChapter1Charts(data) {
+        // Histogramme âge   Graphe1
+        const histogramCanvas = document.getElementById("histogramCanvas");
+        const ageValues = data.map(item => item.age);
+        const minAge = Math.min(...ageValues);
+        const maxAge = Math.max(...ageValues);
+        const binWidth = 5;
+        const bins = Math.ceil((maxAge - minAge) / binWidth);
+        const histogramData = Array(bins).fill(0);
+        ageValues.forEach(age => {
+            const binIndex = Math.floor((age - minAge) / binWidth);
+            if (binIndex >= 0 && binIndex < bins) {
+                histogramData[binIndex]++;
             }
         });
-    }
-});
-
-// Fonction pour attendre que Chart.js soit chargé
-function waitForChartJS() {
-    return new Promise((resolve, reject) => {
-        if (typeof Chart !== 'undefined') {
-            resolve();
-        } else {
-            // Attendre au maximum 5 secondes
-            let attempts = 0;
-            const interval = setInterval(() => {
-                if (typeof Chart !== 'undefined') {
-                    clearInterval(interval);
-                    resolve();
-                } else if (attempts >= 50) { // 5 secondes (100ms * 50)
-                    clearInterval(interval);
-                    reject(new Error("Chart.js n'a pas pu être chargé"));
+        const histogramLabels = Array(bins).fill(0).map((_, i) => minAge + (i * binWidth));
+        if (histogramCanvas) {
+            charts["histogramCanvas"] = new Chart(histogramCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: histogramLabels,
+                    datasets: [{
+                        label: 'Distribution par âge',
+                        data: histogramData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Tendance',
+                        type: 'line',
+                        data: histogramData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribution de l\'âge'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Âge'
+                            },
+                            grid: {
+                                display: true
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Nombre de patients'
+                            },
+                            beginAtZero: true,
+                            grid: {
+                                display: true
+                            }
+                        }
+                    }
                 }
-                attempts++;
-            }, 100);
-        }
-    });
-}
 
-// Fonction pour charger les données avec retry
-async function loadFraminghamData(retries = 3) {
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await fetch("/framingham-data");
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const data = await response.json();
-            console.log("Données chargées avec succès:", data.length, "enregistrements");
-            return data;
-        } catch (error) {
-            console.warn(`Tentative ${i + 1}/${retries} échouée:`, error);
-            if (i === retries - 1) throw error;
-            // Attendre avant de réessayer (temps d'attente exponentiell)
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-        }
-    }
-}
-
-async function initializeCharts() {
-    try {
-        // 1. Attendre que Chart.js soit chargé
-        await waitForChartJS();
-        console.log("Chart.js chargé avec succès");
-
-        // 2. Vérifier si le canvas existe
-        const canvas = document.getElementById('genderPieChart');
-        if (!canvas) {
-            throw new Error("Canvas 'genderPieChart' non trouvé dans le DOM");
-        }
-        console.log("Canvas trouvé");
-
-        console.log("Chargement des données depuis l'API...");
-
-        // Récupérer les données depuis l'API
-        const response = await fetch("/framingham-data");
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP : ${response.status}`);
+            });
         }
 
-        const data = await response.json();
-        console.log("Données reçues :", data);
+        // Répartition genre Graphe2
+        let sexField = Object.keys(data[0]).find(key =>
+            key.toLowerCase().includes('sex') ||
+            key.toLowerCase().includes('gender') ||
+            key.toLowerCase().includes('male')
+        );
 
-        // Vérifiez si les éléments <canvas> existent
-        const areaChartCanvas = document.getElementById("areaChartCanvas");
+        const genderStats = data.reduce((acc, item) => {
+            const sexValue = item[sexField];
+            console.log("Valeur trouvée pour le sexe:", sexValue, typeof sexValue);
+
+            let gender;
+            if (typeof sexValue === 'number') {
+                gender = sexValue === 1 ? 'Hommes' : 'Femmes';
+            } else if (typeof sexValue === 'string') {
+                gender = sexValue.toLowerCase().includes('m') ? 'Hommes' : 'Femmes';
+            }
+
+            if (gender) {
+                acc[gender] = (acc[gender] || 0) + 1;
+            }
+            return acc;
+        }, { 'Hommes': 0, 'Femmes': 0 });
+
+        // Calculer les pourcentages
+        const total = Object.values(genderStats).reduce((a, b) => a + b, 0);
+        const malePercentage = ((genderStats['Hommes'] / total) * 100).toFixed(1);
+        const femalePercentage = ((genderStats['Femmes'] / total) * 100).toFixed(1);
+
+        // Créer les labels avec pourcentages
+        const labels = [
+            `Hommes (${malePercentage}%)`,
+            `Femmes (${femalePercentage}%)`
+        ];
+
+        const genderCanvas = document.getElementById("genderPieChart");
+        if (genderCanvas) {
+            charts["genderPieChart"] = new Chart(genderCanvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,  // Utiliser les labels avec pourcentages
+                    datasets: [{
+                        data: [genderStats['Hommes'], genderStats['Femmes']],
+                        backgroundColor: ['#7CB9E8', '#FFB6C1'],
+                        borderColor: ['#0066b2', '#FF69B4'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const value = context.raw;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        //graphe 3 
+        const smokersCtx = document.getElementById('smokersPieChart').getContext('2d');
+        const smokersData = {
+            smokers: data.filter(item => item.currentSmoker === 1).length,
+            nonSmokers: data.filter(item => item.currentSmoker === 0).length
+        };
+        const totalSmokers = smokersData.smokers + smokersData.nonSmokers;
+        const smokersPercentage = ((smokersData.smokers / totalSmokers) * 100).toFixed(1);
+        const nonSmokersPercentage = ((smokersData.nonSmokers / totalSmokers) * 100).toFixed(1);
+        const labelsSmokers = [
+            `Fumeurs (${smokersPercentage}%)`,
+            `Non-fumeurs (${nonSmokersPercentage}%)`
+        ];
+        new Chart(smokersCtx, {
+            type: 'pie',
+            data: {
+                labels: labelsSmokers,
+                datasets: [{
+                    data: [smokersData.smokers, smokersData.nonSmokers],
+                    backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(75, 192, 192, 0.8)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const value = context.raw;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${context.label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        //graphe4 
+        const cigarettesCtx = document.getElementById('cigarettesBarChart').getContext('2d');
+        const smokerGroups = data.reduce((acc, item) => {
+            if (item.cigsPerDay) {
+                const group = Math.floor(item.cigsPerDay / 5) * 5;
+                acc[group] = (acc[group] || 0) + 1;
+            }
+            return acc;
+        }, {});
+
+        new Chart(cigarettesCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(smokerGroups).map(k => `${k}-${parseInt(k) + 5}`),
+                datasets: [{
+                    label: 'Nombre de fumeurs',
+                    data: Object.values(smokerGroups),
+                    backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Nombre de personnes'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Cigarettes par jour'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // graphe 5
         const barChartCanvas = document.getElementById("barChartCanvas");
+        const educationLevels = [...new Set(data.map(item => item.education))].sort((a, b) => a - b);
+        const smokersByEducation = educationLevels.map(level => {
+            return data.filter(item => item.education === level && item.currentSmoker === 1).length;
+        });
+        new Chart(barChartCanvas, {
+            type: "bar",
+            data: {
+                labels: educationLevels,
+                datasets: [{
+                    label: "Nombre de Fumeurs",
+                    data: smokersByEducation,
+                    backgroundColor: "rgba(255, 99, 132, 0.2)",
+                    borderColor: "rgba(255, 99, 132, 1)",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top",
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Niveau d'Éducation"
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Nombre de Fumeurs"
+                        }
+                    }
+                }
+            }
+        });
 
-        if (!areaChartCanvas || !barChartCanvas) {
-            console.error("Les éléments <canvas> ne sont pas trouvés dans le DOM !");
-            return;
-        }
-
-        // Préparer les données pour le graphique en aires
+        // graphe 6 
         const ages = [...new Set(data.map(item => item.age))].sort((a, b) => a - b);
         const avgCholesterol = ages.map(age => {
             const filtered = data.filter(item => item.age === age);
             const avg = filtered.reduce((sum, item) => sum + item.totChol, 0) / filtered.length;
             return avg.toFixed(2);
         });
-
-        // Graphique en aires
+        const areaChartCanvas = document.getElementById("areaChartCanvas");
         new Chart(areaChartCanvas, {
             type: "line",
             data: {
@@ -250,351 +478,251 @@ async function initializeCharts() {
                 }
             }
         });
+    }
 
-        // Préparer les données pour le graphique en barres
-        const educationLevels = [...new Set(data.map(item => item.education))].sort((a, b) => a - b);
-        const smokersByEducation = educationLevels.map(level => {
-            return data.filter(item => item.education === level && item.currentSmoker === 1).length;
-        });
-
-        // Graphique en barres
-        new Chart(barChartCanvas, {
-            type: "bar",
-            data: {
-                labels: educationLevels,
-                datasets: [{
-                    label: "Nombre de Fumeurs",
-                    data: smokersByEducation,
-                    backgroundColor: "rgba(255, 99, 132, 0.2)",
-                    borderColor: "rgba(255, 99, 132, 1)",
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: "top",
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: "Niveau d'Éducation"
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: "Nombre de Fumeurs"
-                        }
-                    }
-                }
-            }
-        });
-        // Age Histogram
-        const histogramCanvas = document.getElementById("histogramCanvas");
-        if (!histogramCanvas) {
-            console.error("Canvas histogramCanvas not found");
-            return;
-        }
-
-        const ctx = histogramCanvas.getContext('2d');
-        
-        const ageValues = data.map(item => item.age);
-        const minAge = Math.min(...ageValues);
-        const maxAge = Math.max(...ageValues);
-        const binWidth = 5;
-        const bins = Math.ceil((maxAge - minAge) / binWidth);
-        
-        const histogramData = Array(bins).fill(0);
-        ageValues.forEach(age => {
-            const binIndex = Math.floor((age - minAge) / binWidth);
-            if (binIndex >= 0 && binIndex < bins) {
-                histogramData[binIndex]++;
-            }
-        });
-        
-        const histogramLabels = Array(bins).fill(0).map((_, i) => minAge + (i * binWidth));
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: histogramLabels,
-                datasets: [{
-                    label: 'Distribution par âge',
-                    data: histogramData,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }, {
-                    label: 'Tendance',
-                    type: 'line',
-                    data: histogramData,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 2,
-                    fill: false,
-                    tension: 0.4,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Distribution de l\'âge'
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Âge'
-                        },
-                        grid: {
-                            display: true
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Nombre de patients'
-                        },
-                        beginAtZero: true,
-                        grid: {
-                            display: true
-                        }
-                    }
-                }
-            }
-        });
-        
-        console.log("Premier enregistrement:", data[0]);
-        console.log("Noms des colonnes:", Object.keys(data[0]));
-        
-        let sexField = Object.keys(data[0]).find(key => 
-            key.toLowerCase().includes('sex') || 
-            key.toLowerCase().includes('gender') || 
-            key.toLowerCase().includes('male')
-        );
-        
-        console.log("Champ identifié pour le sexe:", sexField);
-        
-        const genderStats = data.reduce((acc, item) => {
-            const sexValue = item[sexField]; 
-            console.log("Valeur trouvée pour le sexe:", sexValue, typeof sexValue);
-            
-            let gender;
-            if (typeof sexValue === 'number') {
-                gender = sexValue === 1 ? 'Hommes' : 'Femmes';
-            } else if (typeof sexValue === 'string') {
-                gender = sexValue.toLowerCase().includes('m') ? 'Hommes' : 'Femmes';
-            }
-            
-            if (gender) {
-                acc[gender] = (acc[gender] || 0) + 1;
-            }
-            return acc;
-        }, { 'Hommes': 0, 'Femmes': 0 });
-        
-        // Calculer les pourcentages
-        const total = Object.values(genderStats).reduce((a, b) => a + b, 0);
-        const malePercentage = ((genderStats['Hommes'] / total) * 100).toFixed(1);
-        const femalePercentage = ((genderStats['Femmes'] / total) * 100).toFixed(1);
-        
-        // Créer les labels avec pourcentages
-        const labels = [
-            `Hommes (${malePercentage}%)`,
-            `Femmes (${femalePercentage}%)`
-        ];
-        
-        const genderCanvas = document.getElementById('genderPieChart');
-        if (genderCanvas) {
-            const ctx = genderCanvas.getContext('2d');
-            ctx.clearRect(0, 0, genderCanvas.width, genderCanvas.height);
-        
-            new Chart(genderCanvas, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,  // Utiliser les labels avec pourcentages
-                    datasets: [{
-                        data: [genderStats['Hommes'], genderStats['Femmes']],
-                        backgroundColor: ['#7CB9E8', '#FFB6C1'],
-                        borderColor: ['#0066b2', '#FF69B4'],
-                        borderWidth: 1
-                    }]
-                },
+    /**
+     * Initialise les graphiques spécifiques au Chapitre 2
+     */
+    function initializeChapter2Charts(data) {
+        const diabetesByAge = document.getElementById("diabetesByAge");
+        if (diabetesByAge) {
+            charts["diabetesByAge"] = new Chart(diabetesByAge.getContext('2d'), {
+                type: "line",
+                data: prepareLineData(data, "age", "diabetes"),
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.raw;
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    return `${context.label}: ${value} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
+                        legend: { position: "top" },
+                    },
+                    scales: {
+                        x: { title: { display: true, text: "Âge" } },
+                        y: { title: { display: true, text: "Taux de Diabète" } },
+                    },
                 }
             });
         }
 
-    // Smokers percentage pie chart
-    const smokersCtx = document.getElementById('smokersPieChart').getContext('2d');
-    const smokersData = {
-        smokers: data.filter(item => item.currentSmoker === 1).length,
-        nonSmokers: data.filter(item => item.currentSmoker === 0).length
-    };
-
-    // Calculer les pourcentages
-    const totalSmokers = smokersData.smokers + smokersData.nonSmokers;
-    const smokersPercentage = ((smokersData.smokers / totalSmokers) * 100).toFixed(1);
-    const nonSmokersPercentage = ((smokersData.nonSmokers / totalSmokers) * 100).toFixed(1);
-
-    // Créer les labels avec pourcentages
-    const labelsSmokers = [
-        `Fumeurs (${smokersPercentage}%)`,
-        `Non-fumeurs (${nonSmokersPercentage}%)`
-    ];
-
-    new Chart(smokersCtx, {
-        type: 'pie',
-        data: {
-            labels: labelsSmokers,
-            datasets: [{
-                data: [smokersData.smokers, smokersData.nonSmokers],
-                backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(75, 192, 192, 0.8)'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 14
-                        }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.raw;
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return `${context.label}: ${value} (${percentage}%)`;
-                        }
-                    }
+        const diabetesBySex = document.getElementById("diabetesBySex");
+        const pieData = preparePieData(data, "male", "diabetes");
+        if (diabetesBySex) {
+            charts["diabetesBySex"] = new Chart(diabetesBySex.getContext('2d'), {
+                type: "pie",
+                data: pieData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: "top" },
+                    },
                 }
-            }
+            });
+        }
+
+        const avgBPBySex = document.getElementById("avgBPBySex");
+        if (avgBPBySex) {
+            charts["avgBPBySex"] = new Chart(avgBPBySex.getContext('2d'), {
+                type: "bar",
+                data: prepareBarData(data, "male", "sysBP"),
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: "top" },
+                    },
+                    scales: {
+                        x: { title: { display: true, text: "Sexe" } },
+                        y: { title: { display: true, text: "Moyenne de la Tension" } },
+                    },
+                }
+            });
+        }
+
+        const scatterSysDiaBP = document.getElementById("scatterSysDiaBP");
+        if (scatterSysDiaBP) {
+            charts["scatterSysDiaBP"] = new Chart(scatterSysDiaBP.getContext('2d'), {
+                type: "scatter",
+                data: prepareScatterData(data, "sysBP", "diaBP"),
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: "top" },
+                    },
+                    scales: {
+                        x: { title: { display: true, text: "SysBP" } },
+                        y: { title: { display: true, text: "DiaBP" } },
+                    },
+                }
+            });
+        }
+        const boxPlotCanvas = document.getElementById("boxPlotSysBP");
+        if (boxPlotCanvas) {
+            charts["boxPlotSysBP"] = new Chart(boxPlotCanvas.getContext('2d'), {
+                type: "bar",
+                data: prepareHistogramData(data, "sysBP"),
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: "Tension Artérielle Systolique (mmHg)" },
+                            beginAtZero: true,
+                        },
+                        y: {
+                            title: { display: true, text: "Nombre de Patients" },
+                            beginAtZero: true,
+                        },
+                    },
+                }
+
+            });
+        }
+        function prepareHistogramData(data, field) {
+            const bins = 10; // Nombre de classes
+            const min = Math.min(...data.map(item => item[field]).filter(value => value !== null && !isNaN(value)));
+            const max = Math.max(...data.map(item => item[field]).filter(value => value !== null && !isNaN(value)));
+            const binSize = (max - min) / bins;
+
+            // Initialiser les classes
+            const histogram = Array(bins).fill(0);
+            data.forEach(item => {
+                const value = item[field];
+                if (value !== null && !isNaN(value)) {
+                    const binIndex = Math.min(Math.floor((value - min) / binSize), bins - 1);
+                    histogram[binIndex]++;
+                }
+            });
+
+            // Préparer les labels et les données
+            const labels = Array.from({ length: bins }, (_, i) => {
+                const lower = (min + i * binSize).toFixed(1);
+                const upper = (min + (i + 1) * binSize).toFixed(1);
+                return `${lower} - ${upper}`;
+            });
+
+            return {
+                labels: labels,
+                datasets: [{
+                    label: "Distribution de SysBP",
+                    data: histogram,
+                    backgroundColor: "rgba(75, 192, 192, 0.5)",
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    borderWidth: 1,
+                }],
+            };
+        }
+
+
+
+        function prepareLineData(data, xField, yField) {
+            const grouped = data.reduce((acc, item) => {
+                const key = item[xField];
+                if (!acc[key]) acc[key] = { total: 0, count: 0 };
+                acc[key].total += item[yField]; // Accumule les cas de diabète
+                acc[key].count += 1;           // Compte le nombre total d'entrées pour cet âge
+                return acc;
+            }, {});
+
+            const labels = Object.keys(grouped).sort((a, b) => a - b);
+            const values = labels.map(label => grouped[label].total / grouped[label].count);
+
+            return {
+                labels: labels,
+                datasets: [{
+                    label: `Taux de Diabète par ${xField}`,
+                    data: values,
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    fill: false,
+                }],
+            };
+        }
+
+
+        function preparePieData(data, groupField, targetField) {
+            const grouped = data.reduce((acc, item) => {
+                acc[item[groupField]] = acc[item[groupField]] || 0;
+                acc[item[groupField]] += item[targetField] === 1 ? 1 : 0;
+                return acc;
+            }, {});
+
+            console.log("Données regroupées pour le pie chart :", grouped);
+
+            return {
+                labels: ["Homme", "Femme"],
+                datasets: [{
+                    label: `Répartition par ${groupField}`,
+                    data: [grouped[1] || 0, grouped[0] || 0], // Homme = 1, Femme = 0
+                    backgroundColor: ["#FF6384", "#36A2EB"],
+                }],
+            };
+        }
+
+        function prepareBarData(data, groupField, targetField) {
+            const grouped = data.reduce((acc, item) => {
+                const group = item[groupField]; // e.g., 1 for male, 0 for female
+                if (!acc[group]) acc[group] = [];
+                acc[group].push(item[targetField]);
+                return acc;
+            }, {});
+
+            // Calculer la moyenne pour chaque groupe
+            const averages = Object.keys(grouped).map(key => {
+                const values = grouped[key];
+                return values.reduce((sum, val) => sum + val, 0) / values.length;
+            });
+
+            return {
+                labels: ["Homme", "Femme"], // Adapter en fonction des valeurs dans `groupField`
+                datasets: [{
+                    label: `Moyenne de ${targetField}`,
+                    data: averages,
+                    backgroundColor: "rgba(75, 192, 192, 0.5)",
+                }]
+            };
+        }
+
+        function prepareScatterData(data, xField, yField) {
+            return {
+                datasets: [{
+                    label: "Corrélation",
+                    data: data.map(item => ({ x: item[xField], y: item[yField] })),
+                    backgroundColor: "rgba(255, 99, 132, 0.5)",
+                }],
+            };
+        }
+
+        function groupBy(data, key, value) {
+            return data.reduce((acc, item) => {
+                const group = item[key];
+                acc[group] = acc[group] || [];
+                acc[group].push(item[value]);
+                return acc;
+            }, {});
+        }
+    }
+    // Observer les changements DOM pour les liens des chapitres
+    const observer = new MutationObserver(() => {
+        const links = ["#chapitre1-link", "#chapitre2-link", "#chapitre3-link", "#chapitre4-link"];
+        if (links.every(selector => document.querySelector(selector))) {
+            console.log("Les liens des chapitres ont été trouvés.");
+            links.forEach((link, index) => loadChapter(link, `/chapitre${index + 1}`));
+            observer.disconnect(); // Arrêter l'observation
         }
     });
 
-    // Average cigarettes per day bar chart
-    const cigarettesCtx = document.getElementById('cigarettesBarChart').getContext('2d');
-    const smokerGroups = data.reduce((acc, item) => {
-        if (item.cigsPerDay) {
-            const group = Math.floor(item.cigsPerDay / 5) * 5;
-            acc[group] = (acc[group] || 0) + 1;
-        }
-        return acc;
-    }, {});
+    // Démarrer l'observation des changements dans le DOM
+    observer.observe(document.body, { childList: true, subtree: true });
 
-    new Chart(cigarettesCtx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(smokerGroups).map(k => `${k}-${parseInt(k)+5}`),
-            datasets: [{
-                label: 'Nombre de fumeurs',
-                data: Object.values(smokerGroups),
-                backgroundColor: 'rgba(153, 102, 255, 0.8)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Nombre de personnes'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Cigarettes par jour'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
+    // Vérifier immédiatement si les liens sont déjà dans le DOM
+    ["#chapitre1-link", "#chapitre2-link", "#chapitre3-link", "#chapitre4-link"].forEach((link, index) =>
+        loadChapter(link, `/chapitre${index + 1}`)
+    );
+});
 
-    } catch (error) {
-        console.error("Erreur lors du chargement des graphiques :", error);
-    }
-}
-
-function attachChapterEvents() {
-    const chapitre1Link = document.querySelector("#chapitre1-link");
-
-    if (chapitre1Link) {
-        chapitre1Link.addEventListener("click", async (event) => {
-            event.preventDefault();
-
-            try {
-                const response = await fetch("/chapitre1");
-                if (response.ok) {
-                    const content = await response.text();
-                    const mainElement = document.querySelector("main#dash");
-                    if (mainElement) {
-                        mainElement.innerHTML = content;
-
-                        // Réinitialiser les graphiques après l'injection du contenu
-                        initializeCharts();
-                    } else {
-                        console.error("L'élément <main id='dash'> n'existe pas !");
-                    }
-                } else {
-                    console.error("Erreur HTTP lors de la récupération de /chapitre1 :", response.status);
-                }
-            } catch (error) {
-                console.error("Erreur lors du chargement du chapitre 1 :", error);
-            }
-        });
-    }
-}
 
 // Exécuter l'attachement des événements après le chargement du DOM
 document.addEventListener("DOMContentLoaded", attachChapterEvents);
 
-
+// -------tableau --------
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Le script est exécuté.");
@@ -607,6 +735,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Table:", table);
 
     const rowsPerPageSelect = document.getElementById("rowsPerPage");
+
     if (!rowsPerPageSelect) {
         console.error("L'élément 'rowsPerPage' n'a pas été trouvé dans le DOM.");
         return;

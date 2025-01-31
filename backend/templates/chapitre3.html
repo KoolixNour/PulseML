@@ -1,0 +1,156 @@
+<div class="container">
+  <h2>Chapitre 3 - Corrélations et analyses croisées</h2>
+  <p>L'objectif de ce chapitre est d'identifier les relations et les corrélations entre différents facteurs de risque pour mieux comprendre les interactions entre les variables liées à la santé et aux comportements.</p>
+
+  <!-- Graphique en aires -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-area me-1"></i>
+          Taux de Cholestérol Moyen par Âge
+        </div>
+        <div class="card-body">
+          <img src="/chart/area" alt="Taux de Cholestérol Moyen par Âge" style="width: 100%;" />
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique représente la variation du taux de cholestérol moyen selon les tranches d'âge sous forme de graphique en aires.</p>
+
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes et points :</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal (X) représente les tranches d'âge des individus (en années).</li>
+          <li>L'axe vertical (Y) représente les taux moyens de cholestérol (en mg/dL).</li>
+          <li>Chaque point correspond à une tranche d'âge moyenne et son taux de cholestérol associé.</li>
+        </ul>
+        <p>
+          <strong>Tendance et interprétation :</strong>
+          <br /> Une augmentation générale du taux de cholestérol est observée avec l'âge, atteignant un pic entre 50 et 60 ans. Après 60 ans, une légère diminution est perceptible. <br />
+          Ces données soulignent les changements métaboliques associés à l'âge.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique en barres -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-bar me-1"></i>
+          Nombre de Fumeurs par Catégorie d'Éducation
+        </div>
+        <div class="card-body">
+          <img src="/chart/bar" alt="Nombre de Fumeurs par Catégorie d'Éducation" style="width: 100%;" />
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique illustre la relation entre le niveau d'éducation et le nombre de fumeurs, représentée sous forme de diagramme en barres.</p>
+
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes et points :</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal (X) représente les catégories de niveaux d'éducation (1 à 4).</li>
+          <li>L'axe vertical (Y) représente le nombre total de fumeurs dans chaque catégorie.</li>
+          <li>Chaque barre correspond au nombre de fumeurs pour un niveau d'éducation donné.</li>
+        </ul>
+        <p>
+          <strong>Tendance et interprétation :</strong>
+          <br /> Une diminution du nombre de fumeurs est observée à mesure que le niveau d'éducation augmente. Cela reflète potentiellement une meilleure sensibilisation des individus plus instruits aux risques liés au tabagisme. <br />
+          Les données soulignent l'importance de l'éducation dans la prévention du tabac.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique Heatmap -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-bar me-1"></i>
+          Carte de Corrélation des Variables
+        </div>
+        <div class="card-body">
+          <img src="/chart/heatmap" alt="Carte de Corrélation des Variables" style="width: 100%;" />
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique présente une carte de corrélation entre différentes variables des données de Framingham.</p>
+
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes et points :</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal (X) et l'axe vertical (Y) représentent les différentes variables.</li>
+          <li>Les cellules colorées indiquent le niveau de corrélation entre deux variables (valeurs allant de -1 à 1).</li>
+          <li>La couleur rouge représente une corrélation positive élevée, tandis que le bleu indique une corrélation négative.</li>
+        </ul>
+        <p>
+          <strong>Tendance et interprétation :</strong>
+          <br /> Des corrélations positives élevées sont observées entre `sysBP` et `diaBP`, ainsi qu'entre d'autres variables associées aux risques cardiovasculaires. Les zones blanches indiquent une corrélation faible ou inexistante. <br />
+          Ces données permettent d’identifier les relations statistiques importantes entre les facteurs de risque.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique Histogramme -->
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-bar me-1"></i>
+          Distribution du Taux de Cholestérol
+        </div>
+        <div class="card-body">
+          <img src="/chart/histogram" alt="Distribution du Taux de Cholestérol" style="width: 100%;" />
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div>
+        <h5>Description</h5>
+        <p>Ce graphique montre la distribution du taux de cholestérol parmi les individus sous forme d'histogramme.</p>
+
+        <p>
+          <strong>Points principaux :</strong>
+        </p>
+        <p>
+          <strong>Axes et points :</strong>
+        </p>
+        <ul>
+          <li>L'axe horizontal (X) représente les plages de taux de cholestérol (en mg/dL).</li>
+          <li>L'axe vertical (Y) représente le nombre d'individus dans chaque plage.</li>
+          <li>Chaque barre correspond à une plage spécifique de taux de cholestérol et sa fréquence associée.</li>
+        </ul>
+        <p>
+          <strong>Tendance et interprétation :</strong>
+          <br /> La distribution est centrée autour de 200-300 mg/dL, indiquant que la majorité des individus ont des niveaux de cholestérol modérés. Les valeurs extrêmes au-delà de 400 mg/dL sont rares. <br />
+          Cela met en évidence une distribution normale des niveaux de cholestérol dans l'échantillon.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
