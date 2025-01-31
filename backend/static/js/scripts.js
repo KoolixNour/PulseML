@@ -534,7 +534,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
-
         const scatterSysDiaBP = document.getElementById("scatterSysDiaBP");
         if (scatterSysDiaBP) {
             charts["scatterSysDiaBP"] = new Chart(scatterSysDiaBP.getContext('2d'), {
