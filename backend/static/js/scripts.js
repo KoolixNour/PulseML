@@ -137,7 +137,11 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (chapterNumber === "2") {
                 console.log("📌 Initialisation des graphiques du Chapitre 2...");
                 initializeChapter2Charts(data);
+            }else if (chapterNumber === "4") {
+                console.log("📌 Initialisation des graphiques du Chapitre 2...");
+                initializeChapter4Charts(data);
             }
+
 
         } catch (error) {
             console.error("❌ Erreur lors du chargement des graphiques :", error);
@@ -698,6 +702,225 @@ document.addEventListener("DOMContentLoaded", () => {
             }, {});
         }
     }
+    
+    function initializeChapter4Charts(data) { 
+        const scatterSysBPvsDiaBP = document.getElementById("scatterSysBPvsDiaBP");
+        const scatterAgeVsBMI = document.getElementById("scatterAgeVsBMI");
+        const cholesterolCanvas =document.getElementById("cholesterolCanvas")
+       console.log("Initialisation des graphiques pour le chapitre 4...");
+   
+       // Graphique de l'histogramme (à remplir comme précédemment)
+       const ageData = data.map(item => item.age);
+       const cholesterolData = data.map(item => item.totChol);
+       const tenYearCHDColors1 = data.map(item => item.TenYearCHD === 1 ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)');
+   
+       new Chart(cholesterolCanvas, {
+           type: 'scatter',
+           data: {
+               datasets: [{
+                   label: 'TenYearCHD = 0 (Pas de risque)', // Label pour TenYearCHD = 0
+                   data: data.filter(item => item.TenYearCHD === 0).map(item => ({
+                       x: item.age,
+                       y: item.totChol
+                   })),
+                   backgroundColor: 'rgba(54, 162, 235, 1)', // Couleur bleu pour TenYearCHD = 0
+                   borderColor: 'rgba(54, 162, 235, 1)',  // Bord bleu pour cohérence
+                   pointRadius: 3,
+                   pointHoverRadius: 8,
+               },
+               {
+                   label: 'TenYearCHD = 1 (Risque)', // Label pour TenYearCHD = 1
+                   data: data.filter(item => item.TenYearCHD === 1).map(item => ({
+                       x: item.age,
+                       y: item.totChol
+                   })),
+                   backgroundColor: 'rgba(255, 99, 132, 1)', // Couleur rouge pour TenYearCHD = 1
+                   borderColor: 'rgba(255, 99, 132, 1)',  // Bord rouge pour cohérence
+                   pointRadius: 3,
+                   pointHoverRadius: 8,
+               }]
+           },
+           options: {
+               responsive: true,
+               plugins: {
+                   legend: {
+                       display: true,
+                       position: 'top',
+                   },
+                   title: {
+                       display: false // Supprimer le titre
+                   }
+               },
+               scales: {
+                   x: {
+                       title: {
+                           display: true,
+                           text: 'Âge'
+                       }
+                   },
+                   y: {
+                       title: {
+                           display: true,
+                           text: 'Cholestérol'
+                       }
+                   }
+               }
+           }
+       });
+       
+   
+       // Autres graphiques du chapitre 3 (nuages de points, violin plots, etc.)
+       // Nuage de points sysBP vs. diaBP
+       // Créer le graphique en nuage de points
+       const sysBP = data.map(item => item.sysBP);
+       const diaBP = data.map(item => item.diaBP);
+   
+       // Colorier les points en fonction de TenYearCHD (1 ou 0)
+       const tenYearCHDColors = data.map(item => item.TenYearCHD === 1 ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)');
+   
+       new Chart(scatterSysBPvsDiaBP, {
+           type: 'scatter',
+           data: {
+               datasets: [{
+                   label: 'TenYearCHD = 0',
+                   data: data.filter(item => item.TenYearCHD === 0).map(item => ({ x: item.sysBP, y: item.diaBP })),
+                   backgroundColor: 'rgba(54, 162, 235, 1)', // Couleur pour TenYearCHD = 0 (bleu)
+                   borderColor: 'rgba(54, 162, 235, 1)',  // Même couleur pour le bord
+                   pointRadius: 3,
+                   pointHoverRadius: 8,
+               },
+               {
+                   label: 'TenYearCHD = 1',
+                   data: data.filter(item => item.TenYearCHD === 1).map(item => ({ x: item.sysBP, y: item.diaBP })),
+                   backgroundColor: 'rgba(255, 206, 86, 1)', // Couleur pour TenYearCHD = 1 (jaune)
+                   borderColor: 'rgba(255, 206, 86, 1)',  // Même couleur pour le bord
+                   pointRadius: 3,
+                   pointHoverRadius: 8,
+               }]
+           },
+           options: {
+               responsive: true,
+               plugins: {
+                   legend: {
+                       display: true,
+                       position: 'top',  // Légende en haut
+                       labels: {
+                           usePointStyle: true,  // Utilisation de points dans la légende
+                           pointStyle: 'circle',  // Les points dans la légende seront des cercles
+                           color: 'rgb(0, 0, 0)',  // Couleur du texte
+                           font: {
+                               size: 14  // Taille de la police
+                           },
+                           padding: 10  // Espacement entre les éléments de la légende
+                       }
+                   },
+                   title: {
+                       display: true,
+                       text: 'sysBP vs. diaBP',  // Titre du graphique
+                       font: {
+                           size: 14
+                       },
+                       padding: {
+                           top: 20,
+                           bottom: 20
+                       }
+                   }
+               },
+               scales: {
+                   x: {
+                       title: {
+                           display: true,
+                           text: 'Pression systolique (sysBP)'  // Titre de l'axe X
+                       },
+                       ticks: {
+                           stepSize: 15  // Espacement plus grand des ticks sur l'axe X
+                       }
+                   },
+                   y: {
+                       title: {
+                           display: true,
+                           text: 'Pression diastolique (diaBP)'  // Titre de l'axe Y
+                       },
+                       ticks: {
+                           stepSize: 15  // Espacement plus grand des ticks sur l'axe Y
+                       }
+                   }
+               }
+           }
+       });
+      
+       // Nuage de points âge vs. BMI
+       new Chart(scatterAgeVsBMI, {
+           type: 'scatter',
+           data: {
+               datasets: [{
+                   label: 'TenYearCHD = 0',
+                   data: data.filter(item => item.TenYearCHD === 0).map(item => ({ x: item.age, y: item.BMI })),
+                   backgroundColor: 'rgba(54, 162, 235, 1)', // Couleur pour TenYearCHD = 0 (bleu)
+                   borderColor: 'rgba(54, 162, 235, 1)',  // Même couleur pour le bord
+                   pointRadius: 3,  // Réduire la taille des points
+                   pointHoverRadius: 5
+               },
+               {
+                   label: 'TenYearCHD = 1',
+                   data: data.filter(item => item.TenYearCHD === 1).map(item => ({ x: item.age, y: item.BMI })),
+                   backgroundColor: 'rgba(255, 206, 86, 1)', // Couleur pour TenYearCHD = 1 (jaune)
+                   borderColor: 'rgba(255, 206, 86, 1)',  // Même couleur pour le bord
+                   pointRadius: 3,  // Réduire la taille des points
+                   pointHoverRadius: 5
+               }]
+           },
+           options: {
+               responsive: true,
+               plugins: {
+                   legend: {
+                       display: true,
+                       position: 'top',
+                       labels: {
+                           usePointStyle: true,
+                           pointStyle: 'circle',
+                           color: 'rgb(0, 0, 0)',
+                           font: {
+                               size: 14
+                           }
+                       }
+                   },
+                   title: {
+                       display: true,
+                       text: 'Relation entre l\'Âge et le BMI',
+                       font: {
+                           size: 16
+                       },
+                       padding: {
+                           top: 20,
+                           bottom: 20
+                       }
+                   }
+               },
+               scales: {
+                   x: {
+                       title: {
+                           display: true,
+                           text: 'Âge'
+                       },
+                       ticks: {
+                           stepSize: 5  // Augmenter l'espacement des ticks sur l'axe X
+                       }
+                   },
+                   y: {
+                       title: {
+                           display: true,
+                           text: 'BMI'
+                       },
+                       ticks: {
+                           stepSize: 5  // Augmenter l'espacement des ticks sur l'axe Y
+                       }
+                   }
+               }
+           }
+       });
+    }
+
     // Observer les changements DOM pour les liens des chapitres
     const observer = new MutationObserver(() => {
         const links = ["#chapitre1-link", "#chapitre2-link", "#chapitre3-link", "#chapitre4-link"];

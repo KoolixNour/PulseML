@@ -1,17 +1,20 @@
 <div class="container">
-    <h2>Chapitre 4 - Détails</h2>
-    <p>Bienvenue dans le chapitre 4. Voici deux graphiques basés sur les données de Framingham :</p>
-
-    <!-- Graphique en aires avec texte -->
+    <h2>Chapitre 4 - Analyser le Risque des maladies cardiaques dans 10 ans</h2>
+    <p> le but est de répondre à la question suivante :
+        - Quels sont les facteurs de risque influençant la probabilité de maladie cardiaque à 10 ans ? et comment la variations de ces derniers affecte cette probabilité?</p>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+ 
+     <!-- Graphique en aires avec texte -->
     <div class="row mb-4">
         <div class="col-lg-6">
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-chart-area me-1"></i>
-                    Taux de Cholestérol Moyen par Âge
+                    la corrélation entre les facteurs de risque et la probabilité de maladie cardiaque à 10 ans
                 </div>
                 <div class="card-body">
-                    <canvas id="areaChartCanvas"></canvas>
+                    <img src="static/assets/img/output (6).png" alt="Cholesterol Box Plot" style="width:100%; max-width:600px;"/>
+
                 </div>
             </div>
         </div>
@@ -19,10 +22,79 @@
             <div>
                 <h5>Description du graphique</h5>
                 <p>
-                    Ce graphique montre comment le taux de cholestérol moyen varie avec l'âge. On observe généralement
-                    une augmentation du taux de cholestérol avec l'âge, atteignant un pic dans les tranches d'âge
-                    entre 50 et 60 ans. Cette tendance peut être liée à des changements dans le métabolisme et
-                    au mode de vie.
+                    Ce graphique montre la corrélation entre différents facteurs de risque et la probabilité de maladie cardiaque à 10 ans.
+                    Remarque clé : On remarque que des facteurs tels que l'âge, la pression artérielle systolique (sysBP) et diastolique (diaBP) ont une corrélation positive plus forte avec la probabilité de maladie cardiaque. Ces résultats confirment les liens bien établis entre ces facteurs et les maladies cardiaques.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique en aires avec texte -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-area me-1"></i>
+                    distribution de l'âge en fonction de la probabilité de maladie cardiaque à 10 ans                </div>
+                <div class="card-body">
+                    <img src="static/assets/img/output (7).png" alt="Cholesterol Box Plot" style="width:100%; max-width:600px;"/>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce boxplot illustre la distribution de l'âge en fonction de la probabilité de maladie cardiaque (0 ou 1).
+                    Remarque clé : On observe que les individus ayant une probabilité plus élevée de maladie cardiaque ont tendance à être plus âgés. Cela peut être lié au vieillissement et à l'augmentation des risques cardiaques avec l'âge.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Répartition de l'âge et du BMI selon la probabilité de maladie cardiaque à 10 ans
+                </div>
+                <div class="card-body">
+                    <canvas id="scatterAgeVsBMI" ></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce graphique de dispersion montre l'âge et l'IMC (BMI) en fonction de la probabilité de maladie cardiaque à 10 ans.
+                    Remarque clé : On peut observer que les individus ayant un BMI élevé ou plus âgés sont souvent associés à une probabilité accrue de maladie cardiaque, ce qui souligne l'importance du contrôle du poids et de l'âge dans les risques cardiovasculaires.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique en aires avec texte -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-area me-1"></i>
+                    Répartition du cholestérol et de l'âge selon la probabilité de maladie cardiaque à 10 ans
+                </div>
+                <div class="card-body">
+                    <canvas id="cholesterolCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex align-items-center">
+            <div>
+                <h5>Description du graphique</h5>
+                <p>
+                    Ce graphique illustre la relation entre le cholestérol, l'âge et la probabilité de maladie cardiaque.
+                    Remarque clé : Il y a une tendance à des niveaux de cholestérol plus élevés chez les individus ayant un risque plus élevé de maladie cardiaque, en particulier chez les plus âgés. Cela met en évidence l'importance du cholestérol dans l'évaluation du risque cardiaque
                 </p>
             </div>
         </div>
@@ -34,10 +106,10 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-chart-bar me-1"></i>
-                    Nombre de Fumeurs par Catégorie d'Éducation
+                    Répartition de la pression artérielle systolique sysBP et diastolique diaBP selon la probabilité de maladie cardiaque à 10 ans
                 </div>
                 <div class="card-body">
-                    <canvas id="barChartCanvas"></canvas>
+                    <canvas id="scatterSysBPvsDiaBP" ></canvas>
                 </div>
             </div>
         </div>
@@ -45,15 +117,16 @@
             <div>
                 <h5>Description du graphique</h5>
                 <p>
-                    Ce graphique illustre la corrélation entre le niveau d'éducation et le nombre de fumeurs. Les données
-                    montrent que les individus avec un niveau d'éducation plus faible ont une prévalence plus élevée de
-                    tabagisme. Cela peut être attribué à un manque d'accès à l'information sur les dangers du tabac.
+                    Ce graphique de dispersion montre la pression artérielle systolique (sysBP) et diastolique (diaBP) en fonction de la probabilité de maladie cardiaque à 10 ans.
+                    Remarque clé : Une pression artérielle élevée, qu'elle soit systolique ou diastolique, est fortement associée à une probabilité accrue de maladie cardiaque. Ce lien souligne l'importance de contrôler la pression artérielle dans la prévention des maladies cardiovasculaires.
                 </p>
             </div>
         </div>
     </div>
-
+   
     <!-- Import des scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot@1.0.0/dist/chartjs-chart-boxplot.min.js"></script>
     <script src="/static/js/scripts.js"></script>
+
 </div>
