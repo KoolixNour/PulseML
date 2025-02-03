@@ -6,3 +6,8 @@ jinja2
 plotly
 dash
 pandas
+scikit-learn
+numpy
+python-multipart
+matplotlib
+seaborn

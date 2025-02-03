@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Prédiction de Maladie Cardiaque</h1>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="prediction-form">
+                <div class="mb-3">
+                    <label>Âge</label>
+                    <input type="number" name="age" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Sexe</label>
+                    <select name="sex" class="form-control">
+                        <option value="0">Femme</option>
+                        <option value="1">Homme</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label>Cigarettes/jour</label>
+                    <input type="number" name="cigsPerDay" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Cholestérol Total</label>
+                    <input type="number" name="totChol" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Pression Systolique</label>
+                    <input type="number" name="sysBP" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Pression Diastolique</label>
+                    <input type="number" name="diaBP" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>IMC</label>
+                    <input type="number" name="BMI" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Fréquence Cardiaque</label>
+                    <input type="number" name="heartRate" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label>Glucose</label>
+                    <input type="number" name="glucose" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Prédire</button>
+            </form>
+            <div id="prediction-result" class="mt-3"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    console.log("Form submitted");
+    
+    const formData = new FormData(e.target);
+    const data = {
+        age: parseInt(formData.get('age')),
+        sex: parseInt(formData.get('sex')),
+        cigsPerDay: parseFloat(formData.get('cigsPerDay')),
+        totChol: parseFloat(formData.get('totChol')),
+        sysBP: parseFloat(formData.get('sysBP')),
+        diaBP: parseFloat(formData.get('diaBP')),
+        BMI: parseFloat(formData.get('BMI')),
+        heartRate: parseFloat(formData.get('heartRate')),
+        glucose: parseFloat(formData.get('glucose'))
+    };
+    
+    console.log("Data:", data);
+
+    try {
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        console.log("Result:", result);
+        
+        document.getElementById('prediction-result').innerHTML = `
+            <div class="alert ${result.prediction.includes('élevé') ? 'alert-danger' : 'alert-success'}">
+                ${result.prediction}
+            </div>`;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+</script>
+{% endblock %}

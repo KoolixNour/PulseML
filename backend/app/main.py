@@ -8,10 +8,13 @@ from fastapi.responses import StreamingResponse
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import pickle
+from pydantic import BaseModel
 
 app = FastAPI()
 # Charger les données
 data = pd.read_csv("database/framingham_cleaned.csv")
+
 #------------------------------graphe--------------
 @app.get("/chart/area")
 async def area_chart():
@@ -132,3 +135,51 @@ async def get_chapitre2(request: Request):
 @app.get("/framingham-data")
 async def get_framingham_data():
     return data.to_dict(orient="records")
+
+model = pickle.load(open('backend/static/assets/model/model.pkl', 'rb'))
+scaler = pickle.load(open('backend/static/assets/model/scaler.pkl', 'rb'))
+
+class HeartDiseaseInput(BaseModel):
+    age: int
+    sex: int
+    cigsPerDay: float
+    totChol: float
+    sysBP: float
+    diaBP: float
+    BMI: float
+    heartRate: float
+    glucose: float
+
+@app.post("/predict")
+async def predict(input_data: HeartDiseaseInput):
+    try:
+        features = pd.DataFrame({
+            'age': [input_data.age],
+            'sex': [input_data.sex],
+            'cigsPerDay': [input_data.cigsPerDay],
+            'BPMeds': [0],
+            'prevalentStroke': [0],
+            'prevalentHyp': [0],
+            'diabetes': [0],
+            'totChol': [input_data.totChol],
+            'sysBP': [input_data.sysBP],
+            'diaBP': [input_data.diaBP],
+            'BMI': [input_data.BMI],
+            'heartRate': [input_data.heartRate],
+            'glucose': [input_data.glucose],
+            'currentSmoker': [1 if input_data.cigsPerDay > 0 else 0],
+            'male': [input_data.sex]
+        })
+
+        prediction = model.predict(features)[0]
+        
+        return {
+            "status": "success",
+            "prediction": "Risque élevé" if prediction == 1 else "Risque faible"
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+@app.get("/application", response_class=HTMLResponse)
+async def get_application(request: Request):
+    return templates.TemplateResponse("application.html", {"request": request})
