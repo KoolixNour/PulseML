@@ -154,11 +154,12 @@ class HeartDiseaseInput(BaseModel):
 async def predict(input_data: HeartDiseaseInput):
     try:
         features = pd.DataFrame({
-            'age': [input_data.age],
             'male': [1 if input_data.sex == 1 else 0],
+            'age': [input_data.age],
+            'education': [1],
+            'currentSmoker': [1 if input_data.cigsPerDay > 0 else 0],
             'cigsPerDay': [input_data.cigsPerDay],
             'BPMeds': [0],
-            'education' : [1],
             'prevalentStroke': [0],
             'prevalentHyp': [0],
             'diabetes': [0],
@@ -167,26 +168,19 @@ async def predict(input_data: HeartDiseaseInput):
             'diaBP': [input_data.diaBP],
             'BMI': [input_data.BMI],
             'heartRate': [input_data.heartRate],
-            'glucose': [input_data.glucose],
-            'currentSmoker': [1 if input_data.cigsPerDay > 0 else 0],
+            'glucose': [input_data.glucose]
         })
-        feature_columns = [
-            'age', 'male', 'cigsPerDay', 'BPMeds', 'education', 'prevalentStroke', 'prevalentHyp',
-            'diabetes', 'totChol', 'sysBP', 'diaBP', 'BMI', 'heartRate', 'glucose', 'currentSmoker'
-         ]
-        features = features[feature_columns]
-
-         # Effectuer la prédiction
-        prediction = model.predict(features)[0]
-
-         # Retourner le résultat
+        
+        features_scaled = scaler.transform(features)
+        prediction = model.predict(features_scaled)[0]
+        
         return {
             "status": "success",
             "prediction": "Risque élevé" if prediction == 1 else "Risque faible"
-         }
+        }
     except Exception as e:
-         return {"status": "error", "error": str(e)}
-
+        return {"status": "error", "error": str(e)}
+    
 @app.get("/application", response_class=HTMLResponse)
 async def get_application(request: Request):
     return templates.TemplateResponse("application.html", {"request": request})
