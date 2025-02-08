@@ -37,7 +37,6 @@ async def area_chart():
 
     return StreamingResponse(buf, media_type="image/png")
 
-
 @app.get("/chart/bar")
 async def bar_chart():
     # Données : Nombre de fumeurs par catégorie d'éducation
@@ -58,7 +57,6 @@ async def bar_chart():
 
     return StreamingResponse(buf, media_type="image/png")
 
-
 @app.get("/chart/heatmap")
 async def heatmap_chart():
     # Données : Matrice de corrélation
@@ -76,7 +74,6 @@ async def heatmap_chart():
     plt.close()
 
     return StreamingResponse(buf, media_type="image/png")
-
 
 @app.get("/chart/histogram")
 async def histogram_chart():
@@ -104,7 +101,6 @@ templates = Jinja2Templates(directory="backend/templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_dashboard(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-
 
 @app.get("/table_content", response_class=HTMLResponse)
 async def get_table_content(request: Request):
@@ -143,7 +139,11 @@ class HeartDiseaseInput(BaseModel):
     age: int
     sex: int
     cigsPerDay: float
+    BPMeds: float
+    prevalentStroke: int
+    prevalentHyp: int
     totChol: float
+    diabetes: int
     sysBP: float
     diaBP: float
     BMI: float
@@ -156,21 +156,22 @@ async def predict(input_data: HeartDiseaseInput):
         features = pd.DataFrame({
             'male': [1 if input_data.sex == 1 else 0],
             'age': [input_data.age],
-            'education': [1],
+            'education' : [2],
             'currentSmoker': [1 if input_data.cigsPerDay > 0 else 0],
             'cigsPerDay': [input_data.cigsPerDay],
-            'BPMeds': [0],
-            'prevalentStroke': [0],
-            'prevalentHyp': [0],
-            'diabetes': [0],
+            'BPMeds': [1 if input_data.BPMeds == 1 else 0],
+            'prevalentStroke': [1 if input_data.prevalentStroke == 1 else 0],
+            'prevalentHyp': [1 if input_data.prevalentHyp == 1 else 0],
+            'diabetes': [1 if input_data.diabetes == 1 else 0],
             'totChol': [input_data.totChol],
             'sysBP': [input_data.sysBP],
             'diaBP': [input_data.diaBP],
             'BMI': [input_data.BMI],
             'heartRate': [input_data.heartRate],
-            'glucose': [input_data.glucose]
+            'glucose': [input_data.glucose],
+            
         })
-        
+
         features_scaled = scaler.transform(features)
         prediction = model.predict(features_scaled)[0]
         
@@ -180,7 +181,7 @@ async def predict(input_data: HeartDiseaseInput):
         }
     except Exception as e:
         return {"status": "error", "error": str(e)}
-    
+
 @app.get("/application", response_class=HTMLResponse)
 async def get_application(request: Request):
     return templates.TemplateResponse("application.html", {"request": request})

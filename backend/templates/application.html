@@ -1,48 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Prédiction de Maladie Cardiaque</h1>
+    <h2 class="mt-4">
+        <i class="fas fa-heartbeat" style="color: #9b0a0a;"></i> <!-- Icône ajoutée à gauche du titre -->
+        Prédiction de Maladie Cardiaque
+    </h2>
+    <p>Veuillez remplir les informations suivantes pour prédire votre risque de maladie cardiaque en fonction de vos données de santé personnelles.</p> <!-- Description introductive -->
     <div class="card mb-4">
         <div class="card-body">
             <form id="prediction-form">
                 <div class="mb-3">
-                    <label>Âge</label>
-                    <input type="number" name="age" class="form-control">
+                    <label for="age">Âge</label>
+                    <input type="number" name="age" class="form-control" id="age" placeholder="Ex: 45">
                 </div>
                 <div class="mb-3">
-                    <label>Sexe</label>
-                    <select name="sex" class="form-control">
+                    <label for="sex">Sexe</label>
+                    <select name="sex" class="form-control" id="sex">
                         <option value="0">Femme</option>
                         <option value="1">Homme</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label>Cigarettes/jour</label>
-                    <input type="number" name="cigsPerDay" class="form-control">
+                    <label for="cigsPerDay">Cigarettes/jour</label>
+                    <input type="number" name="cigsPerDay" class="form-control" id="cigsPerDay" placeholder="Ex: 10">
                 </div>
                 <div class="mb-3">
-                    <label>Cholestérol Total</label>
-                    <input type="number" name="totChol" class="form-control">
+                    <label for="totChol">Cholestérol Total (mg/dL)</label>
+                    <input type="number" name="totChol" class="form-control" id="totChol" placeholder="Ex: 200">
                 </div>
                 <div class="mb-3">
-                    <label>Pression Systolique</label>
-                    <input type="number" name="sysBP" class="form-control">
+                    <label for="BPMeds">Médicaments pour la pression artérielle</label>
+                    <select name="BPMeds" class="form-control" id="BPMeds">
+                        <option value="0">Non</option>
+                        <option value="1">Oui</option>
+                    </select>
                 </div>
                 <div class="mb-3">
-                    <label>Pression Diastolique</label>
-                    <input type="number" name="diaBP" class="form-control">
+                    <label for="hyp">Hypertension préexistante</label>
+                    <select name="hyp" class="form-control" id="hyp">
+                        <option value="0">Non</option>
+                        <option value="1">Oui</option>
+                    </select>
                 </div>
                 <div class="mb-3">
-                    <label>IMC</label>
-                    <input type="number" name="BMI" class="form-control">
+                    <label for="AVC">Antécédent d'AVC</label>
+                    <select name="AVC" class="form-control" id="AVC">
+                        <option value="0">Non</option>
+                        <option value="1">Oui</option>
+                    </select>
+                </div>    
+                <div class="mb-3">
+                    <label for="sysBP">Pression Systolique (mmHg)</label>
+                    <input type="number" name="sysBP" class="form-control" id="sysBP" placeholder="Ex: 120">
                 </div>
                 <div class="mb-3">
-                    <label>Fréquence Cardiaque</label>
-                    <input type="number" name="heartRate" class="form-control">
+                    <label for="diaBP">Pression Diastolique (mmHg)</label>
+                    <input type="number" name="diaBP" class="form-control" id="diaBP" placeholder="Ex: 80">
                 </div>
                 <div class="mb-3">
-                    <label>Glucose</label>
-                    <input type="number" name="glucose" class="form-control">
+                    <label for="BMI">IMC</label>
+                    <input type="number" name="BMI" class="form-control" id="BMI" placeholder="Ex: 25">
+                </div>
+                <div class="mb-3">
+                    <label for="heartRate">Fréquence Cardiaque (bpm)</label>
+                    <input type="number" name="heartRate" class="form-control" id="heartRate" placeholder="Ex: 72">
+                </div>
+                <div class="mb-3">
+                    <label for="diabete">Diabète</label>
+                    <select name="diabete" class="form-control" id="diabete">
+                        <option value="0">Non</option>
+                        <option value="1">Oui</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="glucose">Glucose (mg/dL)</label>
+                    <input type="number" name="glucose" class="form-control" id="glucose" placeholder="Ex: 90">
                 </div>
                 <button type="submit" class="btn btn-primary">Prédire</button>
             </form>
@@ -50,6 +83,33 @@
         </div>
     </div>
 </div>
+
+<style>
+    .form-control {
+        border: none;
+        border-bottom: 2px solid #ccc;
+        border-radius: 0;
+        box-shadow: none;
+        padding-left: 0;
+        padding-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: none;
+    }
+
+    .form-control::placeholder {
+        color: #999;
+    }
+    label {
+    
+    color: #700707;
+    margin-bottom: 3px;
+    }
+
+</style>
 
 <script>
 document.getElementById('prediction-form').addEventListener('submit', async function(e) {
@@ -61,7 +121,11 @@ document.getElementById('prediction-form').addEventListener('submit', async func
         age: parseInt(formData.get('age')),
         sex: parseInt(formData.get('sex')),
         cigsPerDay: parseFloat(formData.get('cigsPerDay')),
+        BPMeds: parseFloat(formData.get('BPMeds')),
+        prevalentStroke: parseInt(formData.get('AVC')),
+        prevalentHyp: parseInt(formData.get('hyp')),
         totChol: parseFloat(formData.get('totChol')),
+        diabetes: parseInt(formData.get('diabete')),
         sysBP: parseFloat(formData.get('sysBP')),
         diaBP: parseFloat(formData.get('diaBP')),
         BMI: parseFloat(formData.get('BMI')),
