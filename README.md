@@ -9,6 +9,7 @@
 [![Tests](https://github.com/KoolixNour/PulseML/actions/workflows/tests.yml/badge.svg)](https://github.com/KoolixNour/PulseML/actions)
 [![License](https://img.shields.io/badge/license-Apache_2.0-green)](https://github.com/KoolixNour/PulseML/blob/main/LICENSE)
 
+
 PulseML est une plateforme web interactive dédiée à l'analyse et la visualisation des données de l'étude Framingham sur les maladies cardiovasculaires. Cette application permet aux utilisateurs d'explorer et de comprendre les facteurs de risque cardiovasculaires à travers des visualisations dynamiques, des analyses statistiques et des prédictions basées sur le machine learning.
 
 ## 📊 Caractéristiques Principales
