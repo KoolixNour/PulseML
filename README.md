@@ -1,7 +1,7 @@
 # PulseML 
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/KoolixNour/PulseML?style=flat)](https://github.com/KoolixNour/PulseML/releases/latest)
-[![GitHub tag](https://img.shields.io/github/v/tag/KoolixNour/PulseML?style=flat)](https://github.com/KoolixNour/PulseML/tags)
+[![GitHub release (latest by date)](https://img.shields.io/badge/release-v0.1-blue)](https://github.com/KoolixNour/PulseML/releases/latest)
+[![GitHub tag](https://img.shields.io/badge/tag-v0.1-blue)](https://github.com/KoolixNour/PulseML/tags)
 ![Status](https://img.shields.io/badge/Status-In%20Development-orange)
 ![Python](https://img.shields.io/badge/python-3.10-blue.svg)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-005571?logo=fastapi)](https://fastapi.tiangolo.com)
