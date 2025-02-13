@@ -1,4 +1,12 @@
-# PulseML - Analyse Interactive des Données Médicales
+# PulseML 
+
+![Python](https://img.shields.io/badge/python-3.10-blue.svg)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-005571?logo=fastapi)](https://fastapi.tiangolo.com)
+[![Chart.js](https://img.shields.io/badge/Chart.js-4.4.0-FF6384?logo=chart.js&logoColor=white)](https://www.chartjs.org)
+![GitHub stars](https://img.shields.io/github/stars/KoolixNour/PulseML)
+![GitHub issues](https://img.shields.io/github/issues/KoolixNour/PulseML)
+[![License](https://img.shields.io/github/license/KoolixNour/PulseML)](https://github.com/KoolixNour/PulseML/blob/main/LICENSE)
+![Status](https://img.shields.io/badge/Status-In%20Development-orange)
 
 PulseML est une plateforme web interactive dédiée à l'analyse et la visualisation des données de l'étude Framingham sur les maladies cardiovasculaires. Cette application permet aux utilisateurs d'explorer et de comprendre les facteurs de risque cardiovasculaires à travers des visualisations dynamiques, des analyses statistiques et des prédictions basées sur le machine learning.
 
